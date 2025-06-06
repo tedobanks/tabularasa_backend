@@ -6,9 +6,10 @@ import (
 
 	"github.com/tedobanks/tabularasa_backend/api"
 	db "github.com/tedobanks/tabularasa_backend/db/sqlc"
+	"github.com/tedobanks/tabularasa_backend/routes"
 	"github.com/tedobanks/tabularasa_backend/util"
 
-	_ "github.com/lib/pq"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 func main() {
@@ -33,11 +34,20 @@ func main() {
 	log.Println("Successfully connected to the database!")
 
 	// Create a new sqlc Queries instance
-	// This uses the New() function from your sqlc generated db.go file.
 	store := db.New(conn)
 
 	// Create a new Gin server and pass the store
-	server := api.NewServer(store) // Pass the *db.Queries directly
+	server := api.NewServer(store)
+
+	// --- NEW: Register the API routes ---
+	// Get the Gin router instance from the server
+	router := server.Router
+
+	// Register user routes
+	routes.RegisterUserRoutes(router, server)
+	// Register venue routes (if you have them implemented in routes/venue_routes.go)
+	routes.RegisterVenueRoutes(router, server)
+	// --- END NEW ---
 
 	// Start the HTTP server
 	log.Printf("Starting server at %s", config.ServerAddress)

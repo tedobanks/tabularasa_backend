@@ -125,13 +125,13 @@ func (q *Queries) DeleteVenue(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getVenue = `-- name: GetVenue :one
+const getVenueByName = `-- name: GetVenueByName :one
 SELECT id, image_links, name, type, description, location, dimension, capacity, facilities, has_accomodation, room_type, no_of_rooms, sleeps, bed_type, rent, owned_by, is_available, opens_at, closes_at, rental_days, booking_price, created_at FROM venues
-WHERE id = $1 LIMIT 1
+WHERE name = $1 LIMIT 1
 `
 
-func (q *Queries) GetVenue(ctx context.Context, id uuid.UUID) (Venues, error) {
-	row := q.db.QueryRowContext(ctx, getVenue, id)
+func (q *Queries) GetVenueByName(ctx context.Context, name string) (Venues, error) {
+	row := q.db.QueryRowContext(ctx, getVenueByName, name)
 	var i Venues
 	err := row.Scan(
 		&i.ID,
